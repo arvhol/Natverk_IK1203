@@ -66,27 +66,35 @@ public class TCPClient {
         }
         fromServerBytes = Buffer.toByteArray(); */ //limit ok
 
-        if(timeout != null && timeout > 0) {
+        /*if(timeout != null && timeout > 0) {
             clientSocket.setSoTimeout(timeout);
+        }
+        try {
+            while((data = clientSocket.getInputStream().read()) != - 1) {
+                Buffer.write(data);
+            }
+        } catch(SocketTimeoutException STE) {
+            clientSocket.close();
+        }*/ // timeout med setSoTimeout
+
+        if(shutdown==false) {
+            if(timeout != null && timeout > 0) {
+                clientSocket.setSoTimeout(timeout);
+            }
             try {
-                while((data = clientSocket.getInputStream().read()) != - 1) {
+                while (limit == null || limit >= 1) {
+                    data = clientSocket.getInputStream().read();
+                    if (data == -1) break;
+                    if (limit != null) limit--;
                     Buffer.write(data);
                 }
-            } catch(SocketTimeoutException STE) {
+            }
+            catch(SocketTimeoutException STE) {
                 clientSocket.close();
             }
-            fromServerBytes = Buffer.toByteArray();
-        } // timeout med setSoTimeout
+        } // finito
 
-        /*while(data != -1 && (timeout == null || timeout > 0)) {
-            try{
-                data = clientSocket.getInputStream().read();
-            }
-            catch(SocketTimeoutException STE){
-
-            }
-        }*/ // timeout början av en tanke
-
+        fromServerBytes = Buffer.toByteArray();
         clientSocket.close();
 
         return fromServerBytes;

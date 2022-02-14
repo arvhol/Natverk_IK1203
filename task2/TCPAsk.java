@@ -2,7 +2,7 @@ import java.net.*;
 import java.io.*;
 import tcpclient.TCPClient;
 
-public class TCPAsk {
+public class  TCPAsk {
 	static boolean shutdown = false;             // True if client should shutdown connection
 	static Integer timeout = null;			     // Max time to wait for data from server (null if no limit)
 	static Integer limit = null;			     // Max no. of bytes to receive from server (null if no limit)
