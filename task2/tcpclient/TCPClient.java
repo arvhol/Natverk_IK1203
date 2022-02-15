@@ -29,7 +29,7 @@ public class TCPClient {
         clientSocket.getOutputStream().write(toServerBytes);
 
         // if shutdown is true, or timeout is less then or equal to zero, never listen to the server
-        if(shutdown == true || timeout <= 0) {
+        if(shutdown == true || timeout <= 0) {  // timeout 0 means inf
             clientSocket.close();
         }
         else {
