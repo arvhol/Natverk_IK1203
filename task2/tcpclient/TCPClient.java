@@ -20,83 +20,39 @@ public class TCPClient {
     public byte[] askServer(String hostname, int port, byte [] toServerBytes) throws IOException {
 
         Socket clientSocket = new Socket(hostname, port);
-        String STR = "shutdown";
-        byte [] fromServerBytes = STR.getBytes();
 
+        byte [] fromServerBytes = new byte[0];
         ByteArrayOutputStream Buffer = new ByteArrayOutputStream();
-        int data = 0;
+        int data;
 
         clientSocket.getOutputStream().write(toServerBytes);
 
-       /* if(shutdown == false) { // if shutdown is true, then skip all reading and close socket
-            ByteArrayOutputStream Buffer = new ByteArrayOutputStream();
-
-            if(limit >= 1) { //
-                int data = clientSocket.getInputStream().read();
-                while(data != - 1) {
-                    limit--;
-                    Buffer.write(data);
-                    if(limit == 0)
-                        break;
-                    data = clientSocket.getInputStream().read();
-                }
-            }
-
-            fromServerBytes = Buffer.toByteArray();
-        }*/
-
-        // long maxTime = System.currentTimeMillis() + timeout;
-        // && (limit >= 1 || limit == null) && (timeout != 0 || timeout == null)
-
-        /*if(shutdown == false) {
-            ByteArrayOutputStream Buffer = new ByteArrayOutputStream();
-            int data = clientSocket.getInputStream().read();
-            while(data != -1) {
-                Buffer.write(data);
-                data = clientSocket.getInputStream().read();
-            }
-            fromServerBytes = Buffer.toByteArray();
-        }*/ //shtdwn funkar
-
-        /*while(limit == null || limit >= 1) {
-            data = clientSocket.getInputStream().read();
-            if(data == -1) break;
-            if(limit != null) limit--;
-            Buffer.write(data);
-        }
-        fromServerBytes = Buffer.toByteArray(); */ //limit ok
-
-        /*if(timeout != null && timeout > 0) {
-            clientSocket.setSoTimeout(timeout);
-        }
-        try {
-            while((data = clientSocket.getInputStream().read()) != - 1) {
-                Buffer.write(data);
-            }
-        } catch(SocketTimeoutException STE) {
+        // if shutdown is true never listen to the server
+        if(shutdown) {
             clientSocket.close();
-        }*/ // timeout med setSoTimeout
+            return fromServerBytes;
+        }
+        // timeout 0 means inf, if timeout null set to inf
+        if(timeout == null || timeout < 0) {
+            timeout = 0;
+        }
+        clientSocket.setSoTimeout(timeout);
 
-        if(shutdown==false) {
-            if(timeout != null && timeout > 0) {
-                clientSocket.setSoTimeout(timeout);
+        try {
+            while(limit == null || limit >= 1) {
+                data = clientSocket.getInputStream().read();
+                if(data == - 1) break;
+                if(limit != null) limit--;
+                Buffer.write(data);
             }
-            try {
-                while (limit == null || limit >= 1) {
-                    data = clientSocket.getInputStream().read();
-                    if (data == -1) break;
-                    if (limit != null) limit--;
-                    Buffer.write(data);
-                }
-            }
-            catch(SocketTimeoutException STE) {
-                clientSocket.close();
-            }
-        } // finito
+        }
+        catch(SocketTimeoutException STE) {
+            System.out.println("socketTimeout err");
+        }
 
-        fromServerBytes = Buffer.toByteArray();
         clientSocket.close();
-
+        fromServerBytes = Buffer.toByteArray();
         return fromServerBytes;
     }
 }
+
