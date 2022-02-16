@@ -20,40 +20,39 @@ public class TCPClient {
     public byte[] askServer(String hostname, int port, byte [] toServerBytes) throws IOException {
 
         Socket clientSocket = new Socket(hostname, port);
-        String STR = "shutdown";
-        byte [] fromServerBytes = STR.getBytes();
 
+        byte [] fromServerBytes = new byte[0];
         ByteArrayOutputStream Buffer = new ByteArrayOutputStream();
-        int data = 0;
+        int data;
 
         clientSocket.getOutputStream().write(toServerBytes);
 
-        // if shutdown is true, or timeout is less then or equal to zero, never listen to the server
-        if(shutdown == true || timeout <= 0) {  // timeout 0 means inf
+        // if shutdown is true never listen to the server
+        if(shutdown) {
             clientSocket.close();
+            return fromServerBytes;
         }
-        else {
-            // if timeout isnt null, and greater than zero we set a timer. Otherwise
-            if(timeout != null && timeout > 0) {
-                clientSocket.setSoTimeout(timeout);
+        // timeout 0 means inf, if timeout null set to inf
+        if(timeout == null || timeout < 0) {
+            timeout = 0;
+        }
+        clientSocket.setSoTimeout(timeout);
+
+        try {
+            while(limit == null || limit >= 1) {
+                data = clientSocket.getInputStream().read();
+                if(data == - 1) break;
+                if(limit != null) limit--;
+                Buffer.write(data);
             }
-            try {
-                while(limit == null || limit >= 1) {
-                    data = clientSocket.getInputStream().read();
-                    if(data == - 1) break;
-                    if(limit != null) limit--;
-                    Buffer.write(data);
-                }
-            }
-            catch(SocketTimeoutException STE) {
-                clientSocket.close();
-            }
-            clientSocket.close();
+        }
+        catch(SocketTimeoutException STE) {
+            System.out.println("socketTimeout err");
         }
 
+        clientSocket.close();
         fromServerBytes = Buffer.toByteArray();
-        //clientSocket.close();
-
         return fromServerBytes;
     }
 }
+
