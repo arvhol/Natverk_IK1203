@@ -27,11 +27,9 @@ public class TCPClient {
 
         clientSocket.getOutputStream().write(toServerBytes);
 
-        // if shutdown is true never listen to the server
-        if(shutdown) {
-            clientSocket.close();
-            return fromServerBytes;
-        }
+        // if shutdown is true, close output
+        if(shutdown) clientSocket.shutdownOutput();
+
         // timeout 0 means inf, if timeout null set to inf
         if(timeout == null || timeout < 0) {
             timeout = 0;
