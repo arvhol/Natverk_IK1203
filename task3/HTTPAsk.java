@@ -7,7 +7,7 @@ public class HTTPAsk {
     public static void main( String[] args) {
         // Your code here
         int port = 0;
-        String str = "HelloWorld, connected?";
+        String str = "HelloWorld, \r\nconnected?";
         byte[] arr = str.getBytes();
         System.out.println(str + " ok");
 
