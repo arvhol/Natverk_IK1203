@@ -22,6 +22,7 @@ public class HTTPAsk {
 
             while(true) {
                 Socket connectionSocket = welcomeSocket.accept();
+                connectionSocket.getOutputStream().write(arr);
                 connectionSocket.close();
             }
         } catch (IOException e) {
