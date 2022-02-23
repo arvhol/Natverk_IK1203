@@ -18,39 +18,42 @@ public class HTTPAsk {
         // testar buffer till read
         int buffSize = 1024;
         byte[] fromClient = new byte[buffSize];
-        // test
-        int testWhile = 0;
 
         ByteArrayOutputStream buff = new ByteArrayOutputStream();
 
         try {
             // creates a server socket that listens to port "portnum"
             ServerSocket welcomeSocket = new ServerSocket(port);
-            System.out.println(port+1);
 
             while(true) {
+                // accept connection and create a new socket for the connection
                 Socket connectionSocket = welcomeSocket.accept();
                 System.out.println("OK1");
 
-                arr = (str + testWhile).getBytes();
+                // Display static msg
+                //arr = (str + testWhile).getBytes();
                 connectionSocket.getOutputStream().write(arr);
                 System.out.println("OK2");
 
+                // read 1024 bytes from client into fromClient
                 int len = connectionSocket.getInputStream().read(fromClient);
                 System.out.println("OK3");
+                // if client msg was as long as buffsize, keep reading
                 while(len == buffSize) {
                     buff.write(fromClient);
                     len = connectionSocket.getInputStream().read(fromClient);
-                    System.out.println("99");
-                    testWhile++;
+                    System.out.println("666");
                 }
-                buff.write(fromClient);
-                System.out.println("fin");
-                byte[] finitMSG = new byte[(buffSize*testWhile) + len];
-                finitMSG = buff.toByteArray();
-                connectionSocket.getOutputStream().write("almost".getBytes());
-                connectionSocket.getOutputStream().write(finitMSG);
-                connectionSocket.getOutputStream().write("fin".getBytes());
+                buff.write(fromClient, 0, len);
+                System.out.println("FIN");
+                fromClient = buff.toByteArray();
+
+                //uri hantering
+
+
+                connectionSocket.getOutputStream().write("almost\r\n\r\n".getBytes());
+                connectionSocket.getOutputStream().write(fromClient);
+                connectionSocket.getOutputStream().write("FIN".getBytes());
 
                 connectionSocket.close();
             }
