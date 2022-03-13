@@ -1,13 +1,18 @@
-import java.net.*;
-import java.io.*;
+import java.io.IOException;
+import java.lang.*;
+import java.net.Socket;
 import tcpclient.*;
 
-public class HTTPAsk {
-    // main is server
-    static int bufferSize = 1024;
+public class ServerRunnable implements Runnable {
+    private Socket connectionSocket;
 
-    public static void main(String[] args) {
-        
+    public ServerRunnable(Socket sock) {
+        connectionSocket = sock;
+    }
+
+    public void run() {
+        //ALL SERVER CODE
+        int bufferSize = 1024;
         int serverPort = 0;
 
         String[] regex = {"hostname=", "port=", "limit=", "shutdown=", "timeout=", "string="};
@@ -16,10 +21,6 @@ public class HTTPAsk {
 
         try {
             // Your code here
-            // binds a socket to serverPort
-            serverPort = Integer.parseInt(args[0]);
-            ServerSocket welcomeSocket = new ServerSocket(serverPort);
-
             while(true) {
                 // TCPClient params
                 String hostname = null;
@@ -31,9 +32,6 @@ public class HTTPAsk {
                 boolean shutdown = false;
 
                 byte[] fromClient = new byte[bufferSize];
-
-                // Accept connection
-                Socket connectionSocket = welcomeSocket.accept();
 
                 // read message from client
                 int fromClientLength = connectionSocket.getInputStream().read(fromClient);
@@ -106,5 +104,5 @@ public class HTTPAsk {
             io.printStackTrace();
         }
     }
-}
 
+}
